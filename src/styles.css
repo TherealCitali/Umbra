@@ -1,0 +1,23 @@
+* { box-sizing: border-box; }
+:root { color-scheme: light dark; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: Canvas; color: CanvasText; }
+#toolbar { height: 88px; display: flex; flex-direction: column; background: color-mix(in srgb, Canvas 92%, GrayText 8%); border-bottom: 1px solid #8885; user-select: none; }
+#tabbar { height: 40px; display: flex; align-items: end; gap: 6px; padding: 6px 8px 0; }
+#tabs { display: flex; gap: 6px; flex: 1; min-width: 0; overflow: hidden; }
+.tab { display: flex; align-items: center; gap: 8px; max-width: 220px; min-width: 120px; padding: 7px 10px; border-radius: 10px 10px 0 0; background: #8882; cursor: pointer; font-size: 13px; }
+.tab.active { background: Canvas; }
+.tab span { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tab .close { border: 0; background: transparent; color: inherit; cursor: pointer; border-radius: 50%; width: 20px; height: 20px; }
+.tab .close:hover { background: #8884; }
+button { font: inherit; }
+#new-tab { width: 28px; height: 28px; border: 0; border-radius: 50%; background: transparent; color: inherit; cursor: pointer; font-size: 18px; }
+#new-tab:hover { background: #8883; }
+#navbar { height: 48px; display: flex; align-items: center; gap: 6px; padding: 6px 8px; }
+#navbar button { min-width: 34px; height: 34px; border: 0; border-radius: 999px; background: transparent; color: inherit; cursor: pointer; }
+#navbar button:hover { background: #8883; }
+#navbar button:disabled { opacity: .35; cursor: default; }
+#address { flex: 1; height: 36px; border: 1px solid #8884; border-radius: 999px; padding: 0 16px; font-size: 14px; background: Canvas; color: CanvasText; outline: none; }
+#address:focus { border-color: #2f6fed; box-shadow: 0 0 0 3px #2f6fed33; }
+#go { padding: 0 14px; font-size: 13px !important; }
+#progress { height: 2px; width: 0; background: #2f6fed; transition: width .2s; }
+#content-placeholder { position: fixed; top: 88px; left: 0; right: 0; bottom: 0; display: grid; place-items: center; opacity: .55; font-size: 14px; z-index: -1; }

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Umbra</title>
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+  <body>
+    <div id="toolbar">
+      <div id="tabbar">
+        <div id="tabs"></div>
+        <button id="new-tab" title="New tab (Ctrl+T)">+</button>
+      </div>
+      <div id="navbar">
+        <button id="back" title="Back (Alt+Left)">&#8592;</button>
+        <button id="forward" title="Forward (Alt+Right)">&#8594;</button>
+        <button id="reload" title="Reload (Ctrl+R)">&#8635;</button>
+        <button id="home" title="Home">⌂</button>
+        <input id="address" type="text" placeholder="Search with DuckDuckGo or enter a URL" spellcheck="false" />
+        <button id="go" title="Go">Go</button>
+      </div>
+      <div id="progress"></div>
+    </div>
+    <div id="content-placeholder">Opening new tab page…</div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
