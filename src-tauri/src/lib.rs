@@ -36,7 +36,20 @@ fn navigate_browser(window: Window, url: String) -> Result<(), String> {
     // as <app-origin>/newtab.html), so a plain parse + navigate is correct
     // for both web pages and bundled app pages.
     let parsed = parse_url(&url)?;
+    let _ = view.show();
     view.navigate(parsed).map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn hide_browser_view(window: Window) -> Result<(), String> {
+    let view = window.get_webview(VIEW_LABEL).ok_or("browser view not created")?;
+    view.hide().map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+fn show_browser_view(window: Window) -> Result<(), String> {
+    let view = window.get_webview(VIEW_LABEL).ok_or("browser view not created")?;
+    view.show().map_err(|e| e.to_string())
 }
 
 #[tauri::command]
