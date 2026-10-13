@@ -1,6 +1,6 @@
 [package]
 name = "umbra"
-version = "0.1.0"
+version = "0.2.0"
 description = "A lightweight, fast Windows browser built with Tauri and WebView2"
 authors = ["Umbra Contributors"]
 edition = "2021"

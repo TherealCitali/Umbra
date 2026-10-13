@@ -7,22 +7,61 @@
     <link rel="stylesheet" href="/src/styles.css" />
   </head>
   <body>
-    <div id="toolbar">
-      <div id="tabbar">
-        <div id="tabs"></div>
+    <header id="chrome">
+      <div id="tab-row" data-tauri-drag-region>
+        <img class="app-icon" src="/umbra-icon.png" alt="Umbra" data-tauri-drag-region />
+        <div id="tabs" role="tablist"></div>
         <button id="new-tab" title="New tab (Ctrl+T)">+</button>
+        <div id="window-controls">
+          <button id="win-min" class="wc" title="Minimize">&#8211;</button>
+          <button id="win-max" class="wc" title="Maximize / Restore">&#9634;</button>
+          <button id="win-close" class="wc wc-close" title="Close Umbra">&#10005;</button>
+        </div>
       </div>
-      <div id="navbar">
-        <button id="back" title="Back (Alt+Left)">&#8592;</button>
-        <button id="forward" title="Forward (Alt+Right)">&#8594;</button>
-        <button id="reload" title="Reload (Ctrl+R)">&#8635;</button>
-        <button id="home" title="Home">⌂</button>
-        <input id="address" type="text" placeholder="Search with DuckDuckGo or enter a URL" spellcheck="false" />
-        <button id="go" title="Go">Go</button>
+      <div id="omnibox-row">
+        <div id="omnibox">
+          <button id="back" class="icon-btn" title="Back (Alt+Left)">&#8592;</button>
+          <button id="forward" class="icon-btn" title="Forward (Alt+Right)">&#8594;</button>
+          <button id="reload" class="icon-btn" title="Reload (Ctrl+R)">&#8635;</button>
+          <button id="home" class="icon-btn" title="Home">&#8962;</button>
+          <span id="site-icon">U</span>
+          <input id="address" type="text" placeholder="Search or type a URL" spellcheck="false" />
+          <span id="engine-label">DuckDuckGo</span>
+          <button id="omnibox-new-tab" class="icon-btn" title="New tab (Ctrl+T)">+</button>
+          <button id="tabs-btn" title="All tabs"><span id="tab-count">1</span></button>
+          <button id="menu-btn" class="icon-btn" title="Menu">&#8942;</button>
+        </div>
       </div>
       <div id="progress"></div>
-    </div>
-    <div id="content-placeholder">Opening new tab page…</div>
+    </header>
+
+    <main id="overlay" hidden>
+      <section id="overview-panel">
+        <div class="segmented">
+          <button class="seg active" id="seg-tabs">&#10003; Tabs &middot; <span id="seg-count">1</span></button>
+          <button class="seg" disabled title="Incognito is not available yet">Incognito &middot; 0</button>
+        </div>
+        <div id="overview-grid"></div>
+        <div class="overview-footer">
+          <button id="overview-done" class="text-btn">Done</button>
+          <button id="overview-new-tab" class="primary-pill">+&nbsp; New tab</button>
+        </div>
+      </section>
+
+      <section id="menu-panel" hidden>
+        <h2>Menu</h2>
+        <button class="menu-item" data-action="new-tab"><span>New tab</span><kbd>Ctrl+T</kbd></button>
+        <button class="menu-item" data-action="home"><span>New tab page</span></button>
+        <button class="menu-item" data-action="reload"><span>Reload page</span><kbd>Ctrl+R</kbd></button>
+        <button class="menu-item" data-action="github"><span>Umbra on GitHub</span></button>
+        <button class="menu-item" data-action="close-tab"><span>Close current tab</span><kbd>Ctrl+W</kbd></button>
+        <div class="overview-footer">
+          <button id="menu-done" class="text-btn">Done</button>
+          <button class="primary-pill" data-action="quit">Close Umbra</button>
+        </div>
+      </section>
+    </main>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

@@ -80,7 +80,9 @@ pub fn run() {
             browser_back,
             browser_forward,
             reload_browser,
-            set_browser_bounds
+            set_browser_bounds,
+            hide_browser_view,
+            show_browser_view
         ])
         .run(tauri::generate_context!())
         .expect("error while running Umbra");
