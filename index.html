@@ -9,14 +9,14 @@
   <body>
     <header id="chrome">
       <div id="tab-row" data-tauri-drag-region>
+        <div id="window-controls">
+          <button id="win-close" class="traffic traffic-close" title="Close Umbra"><span>&#10005;</span></button>
+          <button id="win-min" class="traffic traffic-min" title="Minimize"><span>&#8211;</span></button>
+          <button id="win-max" class="traffic traffic-max" title="Maximize / Restore"><span>+</span></button>
+        </div>
         <img class="app-icon" src="/umbra-icon.png" alt="Umbra" data-tauri-drag-region />
         <div id="tabs" role="tablist"></div>
         <button id="new-tab" title="New tab (Ctrl+T)">+</button>
-        <div id="window-controls">
-          <button id="win-min" class="wc" title="Minimize">&#8211;</button>
-          <button id="win-max" class="wc" title="Maximize / Restore">&#9634;</button>
-          <button id="win-close" class="wc wc-close" title="Close Umbra">&#10005;</button>
-        </div>
       </div>
       <div id="omnibox-row">
         <div id="omnibox">
@@ -26,39 +26,154 @@
           <button id="home" class="icon-btn" title="Home">&#8962;</button>
           <span id="site-icon">U</span>
           <input id="address" type="text" placeholder="Search or type a URL" spellcheck="false" />
+          <span id="incognito-badge" hidden>Incognito</span>
+          <button id="bookmark-btn" class="icon-btn" title="Bookmark this page">&#9734;</button>
           <span id="engine-label">DuckDuckGo</span>
           <button id="omnibox-new-tab" class="icon-btn" title="New tab (Ctrl+T)">+</button>
           <button id="tabs-btn" title="All tabs"><span id="tab-count">1</span></button>
           <button id="menu-btn" class="icon-btn" title="Menu">&#8942;</button>
         </div>
       </div>
+      <div id="bookmarks-bar"></div>
       <div id="progress"></div>
     </header>
 
     <main id="overlay" hidden>
-      <section id="overview-panel">
+      <!-- Tab overview -->
+      <section id="overview-panel" class="panel-view">
         <div class="segmented">
-          <button class="seg active" id="seg-tabs">&#10003; Tabs &middot; <span id="seg-count">1</span></button>
-          <button class="seg" disabled title="Incognito is not available yet">Incognito &middot; 0</button>
+          <button class="seg active">&#10003; Tabs &middot; <span id="seg-count">1</span></button>
+          <button class="seg" id="seg-incognito" title="Toggle incognito mode">Incognito</button>
         </div>
         <div id="overview-grid"></div>
         <div class="overview-footer">
-          <button id="overview-done" class="text-btn">Done</button>
+          <button class="text-btn" data-close-overlay>Done</button>
           <button id="overview-new-tab" class="primary-pill">+&nbsp; New tab</button>
         </div>
       </section>
 
-      <section id="menu-panel" hidden>
-        <h2>Menu</h2>
-        <button class="menu-item" data-action="new-tab"><span>New tab</span><kbd>Ctrl+T</kbd></button>
-        <button class="menu-item" data-action="home"><span>New tab page</span></button>
-        <button class="menu-item" data-action="reload"><span>Reload page</span><kbd>Ctrl+R</kbd></button>
-        <button class="menu-item" data-action="github"><span>Umbra on GitHub</span></button>
-        <button class="menu-item" data-action="close-tab"><span>Close current tab</span><kbd>Ctrl+W</kbd></button>
-        <div class="overview-footer">
-          <button id="menu-done" class="text-btn">Done</button>
-          <button class="primary-pill" data-action="quit">Close Umbra</button>
+      <!-- Menu (icon grid, like the reference screenshots) -->
+      <section id="menu-panel" class="panel-view" hidden>
+        <div class="menu-grid">
+          <button class="menu-tile" data-menu="night"><span class="tile-icon">&#9790;</span>Night mode</button>
+          <button class="menu-tile" data-menu="bookmarks"><span class="tile-icon">&#9733;</span>Bookmarks</button>
+          <button class="menu-tile" data-menu="history"><span class="tile-icon">&#8635;</span>History</button>
+          <button class="menu-tile" disabled title="Downloads are handled by Windows/WebView2 for now"><span class="tile-icon">&#8595;</span>Downloads</button>
+          <button class="menu-tile" data-menu="incognito"><span class="tile-icon">&#9684;</span>Incognito mode</button>
+          <button class="menu-tile" data-menu="share"><span class="tile-icon">&#8599;</span>Share</button>
+          <button class="menu-tile" data-menu="ai"><span class="tile-icon">&#10038;</span>Ask AI</button>
+          <button class="menu-tile" data-menu="settings"><span class="tile-icon">&#9881;</span>Settings</button>
+          <button class="menu-tile" data-menu="find"><span class="tile-icon">&#128269;</span>Find in page</button>
+          <button class="menu-tile" data-menu="source"><span class="tile-icon">&lt;/&gt;</span>View source</button>
+          <button class="menu-tile" data-menu="fullscreen"><span class="tile-icon">&#9974;</span>Full-screen</button>
+          <button class="menu-tile" data-menu="print"><span class="tile-icon">&#128424;</span>Print / Save PDF</button>
         </div>
+        <div class="overview-footer">
+          <button id="menu-quit" class="power-btn" title="Close Umbra">&#9211;</button>
+          <button class="text-btn" data-close-overlay>&#8964; Done</button>
+        </div>
+      </section>
+
+      <!-- Settings -->
+      <section id="settings-panel" class="panel-view sheet" hidden>
+        <div class="sheet-head">
+          <button class="text-btn" data-open-panel="menu">&#8592; Back</button>
+          <h2>Settings</h2><span></span>
+        </div>
+
+        <h3>Appearance</h3>
+        <label class="row"><span>Theme</span>
+          <select id="set-theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+        <label class="row"><span>Force dark mode for web pages <small>Experimental — inverts bright pages</small></span>
+          <input type="checkbox" id="set-force-dark" class="switch" /></label>
+        <label class="row"><span>Show bookmarks bar</span>
+          <input type="checkbox" id="set-bookmarks-bar" class="switch" /></label>
+        <label class="row"><span>Page zoom</span>
+          <select id="set-zoom"><option value="0.5">50%</option><option value="0.75">75%</option><option value="0.9">90%</option><option value="1">100%</option><option value="1.1">110%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option></select></label>
+
+        <h3>General</h3>
+        <label class="row"><span>Search engine</span>
+          <select id="set-search-engine"><option value="duckduckgo">DuckDuckGo</option><option value="google">Google</option><option value="bing">Bing</option></select></label>
+        <label class="row"><span>Incognito mode <small>Private profile, nothing recorded</small></span>
+          <input type="checkbox" id="set-incognito" class="switch" /></label>
+        <div class="row"><span>Downloads</span><small class="muted-text">Handled by WebView2/Windows for now</small></div>
+        <div class="row"><span>Password manager</span><small class="muted-text">Built-in manager planned</small></div>
+
+        <h3>AI assistant</h3>
+        <label class="row"><span>AI service provider</span>
+          <select id="set-ai-provider">
+            <option value="none">None</option><option value="custom">Custom (OpenAI-compatible)</option>
+            <option value="chatgpt">ChatGPT</option><option value="openrouter">OpenRouter</option>
+            <option value="gemini">Google Gemini</option><option value="claude">Claude</option>
+            <option value="bytedance">ByteDance</option><option value="alibaba">AlibabaCloud</option>
+            <option value="deepseek">DeepSeek</option><option value="siliconflow">SiliconFlow</option>
+          </select></label>
+        <label class="row"><span>API key <small>Stored only on this PC, never uploaded by Umbra</small></span>
+          <input type="password" id="set-ai-key" placeholder="Paste your own API key" autocomplete="off" /></label>
+        <label class="row"><span>Model <small>Leave blank for the provider default</small></span>
+          <input type="text" id="set-ai-model" placeholder="e.g. gpt-4o-mini / gemini-2.5-flash" /></label>
+        <label class="row" id="ai-baseurl-row"><span>Custom endpoint URL</span>
+          <input type="text" id="set-ai-baseurl" placeholder="https://your-endpoint/v1" /></label>
+        <label class="row column"><span>AI prompt</span>
+          <textarea id="set-ai-prompt" rows="3"></textarea></label>
+        <label class="row"><span>AI agent browsing <small>Coming soon — AI will click &amp; browse for you</small></span>
+          <input type="checkbox" class="switch" disabled /></label>
+
+        <h3>Privacy &amp; data</h3>
+        <div class="row"><span>Clear browsing data <small>Cookies, cache &amp; site data for all sites</small></span>
+          <button class="small-btn" id="clear-data-btn">Clear data</button></div>
+        <div class="row"><span>Clear history</span>
+          <button class="small-btn" id="clear-history-btn">Clear history</button></div>
+        <label class="row"><span>Ad blocking</span><small class="muted-text">Planned with the extensions engine</small></label>
+
+        <h3>Extensions</h3>
+        <div class="row"><span>Extensions</span><small class="muted-text">Planned for a future release — the browser core is being kept extension-ready</small></div>
+
+        <h3>About</h3>
+        <div class="row"><span>Umbra 0.3.0</span>
+          <button class="small-btn" id="about-github-btn">GitHub</button></div>
+      </section>
+
+      <!-- Bookmarks / History manager -->
+      <section id="manager-panel" class="panel-view sheet" hidden>
+        <div class="sheet-head">
+          <button class="text-btn" data-open-panel="menu">&#8592; Back</button>
+          <h2 id="manager-title">Bookmarks</h2><span></span>
+        </div>
+        <div id="manager-list"></div>
+        <div class="overview-footer">
+          <button class="text-btn danger-text" id="manager-clear">Clear</button>
+          <button class="primary-pill" id="manager-add-current">+ Bookmark this page</button>
+        </div>
+      </section>
+
+      <!-- Ask AI -->
+      <section id="ai-panel" class="panel-view sheet" hidden>
+        <div class="sheet-head">
+          <button class="text-btn" data-open-panel="menu">&#8592; Back</button>
+          <h2>&#10038; Ask AI</h2>
+          <button class="text-btn" data-open-panel="settings">AI settings</button>
+        </div>
+        <p class="context-line" id="ai-context">Ask anything — the current page will be used as context.</p>
+        <textarea id="ai-question" rows="3" placeholder="Ask a question about this page… e.g. Summarize this page in 3 points"></textarea>
+        <div class="ai-actions">
+          <button class="primary-pill" id="ai-ask-btn">Ask</button>
+          <button class="text-btn" data-close-overlay>Done</button>
+        </div>
+        <div id="ai-answer">Answers appear here. Add your provider &amp; API key in Settings → AI assistant first.</div>
+      </section>
+
+      <!-- Find in page -->
+      <section id="find-panel" class="panel-view sheet narrow" hidden>
+        <div class="sheet-head">
+          <button class="text-btn" data-open-panel="menu">&#8592; Back</button>
+          <h2>Find in page</h2><span></span>
+        </div>
+        <div class="find-row">
+          <input type="text" id="find-input" placeholder="Type to find…" />
+          <button class="primary-pill" id="find-next-btn">Find</button>
+        </div>
+        <div class="overview-footer"><span></span><button class="text-btn" data-close-overlay>Done</button></div>
       </section>
     </main>
 

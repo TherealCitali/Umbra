@@ -5,13 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>New Tab</title>
 <style>
-  :root{color-scheme:light;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;--ink:#2f3a63;--muted:#8a90ad;--pill:#e8e8f1}
+  :root{color-scheme:light;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;--ink:#2f3a63;--muted:#8a90ad;--pill:#e8e8f1;--bg:#f3f3f9}
+  html.dark{color-scheme:dark;--ink:#eceaf7;--muted:#8f93ad;--pill:#262633;--bg:#14141c}
+  @media (prefers-color-scheme: dark){ :root{color-scheme:dark;--ink:#eceaf7;--muted:#8f93ad;--pill:#262633;--bg:#14141c} }
   *{box-sizing:border-box}
   body{margin:0;min-height:100vh;display:grid;place-items:center;color:var(--ink);
     background:
       radial-gradient(560px 340px at 98% -80px, rgba(169,190,238,.55), transparent 70%),
       radial-gradient(520px 360px at -40px 108%, rgba(243,205,233,.6), transparent 70%),
-      #f3f3f9}
+      var(--bg)}
   main{text-align:center;padding:32px 24px;max-width:680px;width:100%}
   img.logo{width:88px;height:88px;border-radius:50%;box-shadow:0 10px 28px rgba(50,60,110,.18)}
   h1{font-size:52px;margin:14px 0 26px;letter-spacing:-.02em}
@@ -20,14 +22,23 @@
   input{flex:1;border:0;background:transparent;font-size:16px;color:var(--ink);outline:none;min-width:40px}
   input::placeholder{color:var(--muted)}
   .engine{font-size:12.5px;color:var(--muted);padding-right:8px;white-space:nowrap}
-  button.go{border:0;border-radius:999px;background:#d7def5;color:var(--ink);font-size:15px;font-weight:700;padding:12px 20px;cursor:pointer}
-  button.go:hover{background:#c9d4f2}
+  button.go{border:0;border-radius:999px;background:#d7def5;color:#2f3a63;font-size:15px;font-weight:700;padding:12px 20px;cursor:pointer}
+  html.dark button.go{background:#33406e;color:#eceaf7}
   .shortcuts{margin-top:34px;display:flex;gap:26px;justify-content:center;flex-wrap:wrap}
   .shortcut{display:flex;flex-direction:column;align-items:center;gap:8px;text-decoration:none;color:var(--ink);font-size:13px}
   .shortcut .circle{width:58px;height:58px;border-radius:50%;background:var(--pill);display:grid;place-items:center;font-size:20px;font-weight:700;box-shadow:0 4px 14px rgba(50,60,110,.08)}
-  .shortcut:hover .circle{background:#fff}
+  .shortcut:hover .circle{filter:brightness(1.07)}
   p.tag{color:var(--muted);margin:26px 0 0;font-size:13.5px}
 </style>
+<script>
+  // Match the chrome theme when settings are shared with this web view.
+  try {
+    const s = JSON.parse(localStorage.getItem('umbra-settings-v1') || '{}');
+    const dark = s.theme === 'dark' || (s.theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+    if (dark) document.documentElement.classList.add('dark');
+    if (s.theme === 'light') document.documentElement.classList.remove('dark');
+  } catch (e) {}
+</script>
 </head>
 <body>
 <main>
@@ -36,7 +47,7 @@
   <form id="f">
     <span class="mag">&#128269;</span>
     <input id="q" placeholder="Search or type a URL" autofocus />
-    <span class="engine">DuckDuckGo</span>
+    <span class="engine" id="engine-label">DuckDuckGo</span>
     <button class="go">Search</button>
   </form>
   <div class="shortcuts">
@@ -48,12 +59,24 @@
   <p class="tag">Lightweight, fast, private by default.</p>
 </main>
 <script>
+  let engine = 'duckduckgo';
+  try {
+    const s = JSON.parse(localStorage.getItem('umbra-settings-v1') || '{}');
+    if (s.searchEngine) engine = s.searchEngine;
+  } catch (e) {}
+  const templates = {
+    duckduckgo: q => 'https://duckduckgo.com/?q=' + encodeURIComponent(q),
+    google: q => 'https://www.google.com/search?q=' + encodeURIComponent(q),
+    bing: q => 'https://www.bing.com/search?q=' + encodeURIComponent(q),
+  };
+  const labels = { duckduckgo: 'DuckDuckGo', google: 'Google', bing: 'Bing' };
+  document.getElementById('engine-label').textContent = labels[engine] || 'DuckDuckGo';
   document.getElementById('f').addEventListener('submit', e => {
     e.preventDefault();
     const v = document.getElementById('q').value.trim();
     if (!v) return;
     const isUrl = !v.includes(' ') && v.includes('.');
-    location.href = isUrl ? (v.startsWith('http') ? v : 'https://' + v) : 'https://duckduckgo.com/?q=' + encodeURIComponent(v);
+    location.href = isUrl ? (v.startsWith('http') ? v : 'https://' + v) : templates[engine](v);
   });
 </script>
 </body>
